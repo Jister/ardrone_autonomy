@@ -1,0 +1,70 @@
+https://www.drone-forum.com/forum/viewtopic.php?t=2291
+
+Disclaimer
+Attempt this at your own risk! I nor Parrot are responsible for any damage done to your drone. This will void the warranty. This also only been tested on firmware version 1.7.4. Also, this does not change boot. If you cycle power it will go back to default.
+
+Description
+This mod allows you to set your drone to a specific WiFi channel, instead of channel 6 or some random one. Specifying a channel with the least amount of traffic should help improve connectivity and range. Also, wherever you see MyChannel replace that with the channel number you want to use. For example, "iwconfig ath0 channel MyChannel" becomes "iwconfig ath0 channel 5". 
+
+Requirements
+Android phone(Can use a Iphone but I have a droid so you may have to find equivalent apps.)
+An AR.Drone (Duh!)
+A computer with WiFi capability
+Some spare time
+
+Instructions
+
+Step 1
+You need to get a WiFi analyzer app on your phone, then walk around your general flying area and use the channel scanner to see which is the most open wifi channel in the area. This is the "custom" channel that you will force the drone to use. Note that only channels 1 through 11 are available for use in the US.
+
+
+Image
+
+This is the free WiFi Analyzer app on the android market. A link is below.
+WIFi Analyzer
+
+
+Step 2
+Plug in your drone. Once the LEDs are green, connect to the drone's WiFi with your computer and launch your telnet client. Then input 192.168.1.1 as the ip address and select telnet. Then press connect. A terminal will pop up. This is the brain of your drone.
+
+Step 3
+Now we're going to write the script that changes the channel. Type the following command that creates the script:
+
+cat > chMyChannel.sh 
+
+For example:
+cat > ch5.sh
+Then type this:
+CODE: SELECT ALL
+SSID=`grep ssid_single_player /data/config.ini | awk -F "=" '{print $2}'`
+ifconfig ath0 down
+iwconfig ath0 mode master essid $SSID channel MyChannel
+iwconfig ath0 commit
+ifconfig ath0 192.168.1.1 netmask 255.255.255.0 up
+
+Put it in as I have written, with each command on a new line. Then make a new line (just hit return) and press CTL-D to finish it.
+Then type: 
+
+chmod 755 /chMyChannel.sh
+
+To test it type:
+
+/chMyChannel.sh
+
+Your terminal should hang because the drone has changed WiFi channels! Check with your WiFi analyzer to see if its on MyChannel.
+(Note: It is sometimes necessary to restart the WiFi analyzer for it to register the channel change)
+
+Step 4
+Now that we have done that, you can go get a telnet app for your droid like this one:
+https://market.android.com/details?id=koushikdutta.telnet&feature=search_result#?t=W251bGwsMSwyLDEsImtvdXNoaWtkdXR0YS50ZWxuZXQiXQ.. 
+Reboot your drone then connect to it with your phone. open the app and type in 192.168.1.1 for the address and connect. Then type:
+
+/chMyChannel.sh
+
+and it should do the same thing! So now you don't have to have a laptop to change the channel!
+
+Keep in mind that you can repeat this process to create multiple scripts that set to different channels, like ch1.sh, ch7.sh, ch9.sh, etc...
+
+Also, when you cycle power on your drone, it will revert to the factory default, so you will have to go in and run the script each time you cycle power. The good news is that its not permanent, so its pretty hard to brick your drone.
+
+Thats all, Happy flying!
